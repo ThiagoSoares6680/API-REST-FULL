@@ -1,5 +1,6 @@
 import User from "../models/user.model";
 import db from "../db";
+import { DatabaseError } from "../models/erros/database.error.model";
 
 
 
@@ -19,16 +20,17 @@ class UserRepository {
 
     // Consultar usurios por ID
 
+
     async findById(uuid: string): Promise<User>{
         const query = `
             SELECT uuid, username
             FROM aplication_user
             WHERE uuid = $1
         `;
-        const values = [uuid];
-        const { rows } = await db.query<User>(query, values);
-        const [user] = rows;
-        return user;
+            const values = [uuid];
+            const { rows } = await db.query<User>(query, values);
+            const [user] = rows;
+            return user;
     }
 
     // Criação de usuarios

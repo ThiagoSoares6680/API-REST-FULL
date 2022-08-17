@@ -1,6 +1,6 @@
 import User from "../models/user.model";
 import db from "../db";
-import { DatabaseError } from "../models/erros/database.error.model";
+import  DatabaseError  from "../models/erros/database.error.model";
 
 
 
@@ -33,6 +33,26 @@ class UserRepository {
             return user;
     }
 
+    //Token 
+
+    async findByUsernameAndPassword(username: string, password: string): Promise< User | null> {
+        try{
+            const query = `
+                SELECT uuid, username
+                FROM aplication_user
+                WHERE username = $1
+                AND password = crypt($2, 'my_salt')
+            `;
+            const values = [username, password];
+            const response = await db.query<User>(query, values);
+            const [user] = response.rows;
+            return user || null;
+        } catch(error) {
+            throw new DatabaseError('Erro na consulta por username e passoword', error);
+        }
+
+    }
+
     // Criação de usuarios
 
     async create(user: User): Promise<string>{
@@ -41,7 +61,7 @@ class UserRepository {
             username,
             password
         )
-        VALUES ($1, crypt($2, '$my_salt'))
+        VALUES ($1, crypt($2, 'my_salt'))
         RETURNING uuid
         `;
         const values = [user.username, user.password];
@@ -80,6 +100,8 @@ class UserRepository {
     }
 
 }
+
+
 
 
 export default new UserRepository();

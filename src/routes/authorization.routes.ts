@@ -1,9 +1,10 @@
 import { NextFunction, Router, Request, Response } from "express";
 import ForbidenError from "../models/erros/forbidden.error.model";
-import JWT from 'jsonwebtoken';
+import JWT, { SignOptions } from 'jsonwebtoken';
 import { StatusCodes } from "http-status-codes";
 import basicAuthnticationMiddleware from "../middlewares/basic-authentication.middleware";
 import wjtAthenticationMiddleware from "../middlewares/jwt-authentication.middleware";
+import { SigningOptions } from "crypto";
 
 const authorizationRoute = Router();
 
@@ -19,7 +20,7 @@ authorizationRoute.post('/token',basicAuthnticationMiddleware , async (req: Requ
             throw new ForbidenError('usuario não informado!')
         }
         const jwtPayload = { username: user.username}
-        const jwtOptions = {subject: user?.uuid}
+        const jwtOptions: SignOptions = {subject: user?.uuid, expiresIn: '15m'}
         const secretKey = 'my_secret_key'
 
         const jwt = JWT.sign(jwtPayload, secretKey ,jwtOptions)
